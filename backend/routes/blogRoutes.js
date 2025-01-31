@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const Blog = require('../models/Blog');  // Make sure the path to the Blog model is correct
+const Blog = require('../models/Blog');  // Make sure the path is correct
 
 // Route to get all blogs
 router.get('/blogs', async (req, res) => {
@@ -76,23 +76,26 @@ router.put('/blogs/:id', async (req, res) => {
   }
 });
 
-// Route to get a single blog by its ID
-router.get('/blogs/:id', async (req, res) => {
-    const { id } = req.params;  // Extract the blog ID from the request parameters
-  
-    try {
-      // Fetch the blog by its ID
-      const blog = await Blog.findById(id);
-      
-      if (!blog) {
-        return res.status(404).json({ message: 'Blog not found' });
-      }
-  
-      res.json(blog);  // Return the blog as a JSON response
-    } catch (error) {
-      console.error('Error fetching blog:', error);
-      res.status(500).json({ message: 'Error fetching blog' });
+// Route to delete a blog by its ID
+router.delete('/blogs/:id', async (req, res) => {
+  const { id } = req.params;  // Get the blog ID from the URL parameters
+
+  try {
+    // Find and delete the blog by ID
+    const deletedBlog = await Blog.findByIdAndDelete(id);
+
+    if (!deletedBlog) {
+      return res.status(404).json({ message: 'Blog not found' });
     }
-  });
+
+    // Respond with a success message
+    res.status(200).json({
+      message: 'Blog deleted successfully!',
+    });
+  } catch (error) {
+    console.error('Error deleting blog:', error);
+    res.status(500).json({ message: 'Error deleting blog' });
+  }
+});
 
 module.exports = router;
